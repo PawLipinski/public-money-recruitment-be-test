@@ -10,6 +10,7 @@ namespace VacationRental.Api.Repositories
         Unit Get(int unitId);
         void CreateMany(int rentalId, int count);
         List<Unit> GetByRental(int rentalId);
+        int GetUnitPerRentalId(int unitId);
     }
 
     public class UnitRepository : IUnitRepository
@@ -44,6 +45,18 @@ namespace VacationRental.Api.Repositories
         public List<Unit> GetByRental(int rentalId)
         {
             return _units.Where(u => u.RentalId == rentalId).ToList();
+        }
+
+        public int GetUnitPerRentalId(int unitId)
+        {
+            var unit = Get(unitId);
+            var id = _units.Where(u => u.RentalId == unit.RentalId)
+                .OrderBy(u => u.Id)
+                .Select((u, index) => new { number = index, unit = u })
+                .Where(e => e.unit.Id == unitId)
+                .Select(e => e.number)
+                .FirstOrDefault();
+            return id;
         }
     }
 }

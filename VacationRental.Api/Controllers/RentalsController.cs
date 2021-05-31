@@ -27,14 +27,14 @@ namespace VacationRental.Api.Controllers
             return new RentalViewModel()
             {
                 Id = rental.Id,
-                Units = units.Count()
+                Units = units.Count(),
             };
         }
 
         [HttpPost]
         public ResourceIdViewModel Post(RentalBindingModel model)
         {
-            var newRentalId = _rentals.Add(model);
+            var newRentalId = _rentals.Add(model.Units, model.PreparationTimeInDays);
             return new ResourceIdViewModel(){ Id = newRentalId };
         }
     }

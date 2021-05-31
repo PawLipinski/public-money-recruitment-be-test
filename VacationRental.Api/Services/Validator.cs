@@ -1,7 +1,7 @@
 ﻿using System;
 using VacationRental.Api.Repositories;
 
-namespace VacationRental.Api.Helpers
+namespace VacationRental.Api.Services
 {
     public interface IValidator
     {

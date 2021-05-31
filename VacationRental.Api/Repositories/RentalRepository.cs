@@ -7,7 +7,7 @@ namespace VacationRental.Api.Repositories
     public interface IRentalRepository
     {
         Rental Get(int id);
-        int Add(RentalBindingModel model);
+        int Add(int unitsNumber, int preparationDaysNumber);
     }
 
     public class RentalRepository : IRentalRepository
@@ -20,11 +20,11 @@ namespace VacationRental.Api.Repositories
             _unitRepository = unitRepository;
         }
 
-        public int Add(RentalBindingModel model)
+        public int Add(int unitsNumber, int preparationDaysNumber)
         {
             var newRentalId = _rentals.Any() ? _rentals.Max(r => r.Id) + 1 : 1;
-            _unitRepository.CreateMany(newRentalId, model.Units);
-            _rentals.Add(new Rental() { Id = newRentalId });
+            _unitRepository.CreateMany(newRentalId, unitsNumber);
+            _rentals.Add(new Rental() { Id = newRentalId, PreparationTimeInDays = preparationDaysNumber });
 
             return newRentalId;
         }

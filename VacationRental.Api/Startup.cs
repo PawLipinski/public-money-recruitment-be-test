@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using VacationRental.Api.Helpers;
 using VacationRental.Api.Models;
 using VacationRental.Api.Repositories;
+using VacationRental.Api.Services;
 
 namespace VacationRental.Api
 {
@@ -32,6 +33,7 @@ namespace VacationRental.Api
             services.AddSingleton<IBookingRepository, BookingRepository>();
             services.AddSingleton<IValidator, Validator>();
             services.AddTransient<ICalendarBuilder, CalendarBuilder>();
+            services.AddTransient<ICalendarWithPreparationsBuilder, CalendarWithPreparationsBuilder>();
             services.AddTransient<IBookingService, BookingService>();
         }
 

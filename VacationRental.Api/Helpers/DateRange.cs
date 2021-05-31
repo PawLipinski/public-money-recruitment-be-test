@@ -1,26 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VacationRental.Api.Models;
 
 namespace VacationRental.Api.Helpers
 {
     public class DateRange
     {
-        private readonly DateTime _startDate;
-        private readonly DateTime _endDate;
+        public DateTime StartDate { get; private set; }
+        public DateTime EndDate { get; private set; }
 
         public List<DateTime> DatesInRange { get; private set; }
 
         public DateRange(DateTime startDate, int nights)
         {
-            _startDate = startDate;
-            _endDate = startDate.AddDays(nights - 1);
-            InitiateDatesInRange(startDate, nights);
+            StartDate = startDate;
+            var actualDays = nights - 1;
+            EndDate = startDate.AddDays(actualDays);
+            InitiateDatesInRange();
+        }
+
+        public DateRange(Booking booking) : this(booking.Start, booking.Nights) { }
+
+        public DateRange(DateRange prototype)
+        {
+            StartDate = prototype.StartDate;
+            EndDate = prototype.EndDate;
+            DatesInRange = prototype.DatesInRange;
         }
 
         public bool IsDateInRange(DateTime date)
         {
-            return date >= _startDate && date <= _endDate;
+            return date >= StartDate && date <= EndDate;
         }
 
         public bool IsColliding(DateRange otherDateRange)
@@ -32,13 +43,24 @@ namespace VacationRental.Api.Helpers
             return false;
         }
 
-        private void InitiateDatesInRange(DateTime startDate, int nights)
+        public DateRange Extend(int days)
+        {
+            var dateRangeToReturn = new DateRange(this);
+            dateRangeToReturn.EndDate = dateRangeToReturn.EndDate.AddDays(days);
+            dateRangeToReturn.InitiateDatesInRange();
+            return dateRangeToReturn;
+        }
+
+        private void InitiateDatesInRange()
         {
             DatesInRange = new List<DateTime>();
-            for (int i = 0; i < nights; i++)
+            var nights = (EndDate - StartDate).TotalDays;
+            DatesInRange.Add(StartDate);
+            for (int i = 1; i < nights; i++)
             {
-                DatesInRange.Add(startDate.AddDays(i));
+                DatesInRange.Add(StartDate.AddDays(i));
             }
+            DatesInRange.Add(EndDate);
         }
     }
 }
