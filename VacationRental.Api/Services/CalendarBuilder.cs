@@ -58,12 +58,6 @@ namespace VacationRental.Api.Services
                 Bookings = new List<Booking>(),
             };
             var applicableBookings = bookings.Where(b => IsBookingOnSpecifiedDate(b, date.Date));
-            //var calendarBookingViewModels = applicableBookings.Select(ab =>
-            //                new CalendarBookingViewModel()
-            //                {
-            //                    Id = ab.Id,
-            //                    Unit = _units.GetUnitPerRentalId(ab.UnitId)
-            //                });
             calendarDate.Bookings.AddRange(applicableBookings);
             return calendarDate;
         }

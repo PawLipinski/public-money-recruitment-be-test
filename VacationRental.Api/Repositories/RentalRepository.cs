@@ -8,6 +8,8 @@ namespace VacationRental.Api.Repositories
     {
         Rental Get(int id);
         int Add(int unitsNumber, int preparationDaysNumber);
+        Rental Update(int rentalId, int units, int preparationTime);
+        List<Rental> GetAll();
     }
 
     public class RentalRepository : IRentalRepository
@@ -31,8 +33,23 @@ namespace VacationRental.Api.Repositories
 
         public Rental Get(int id)
         {
-            return _rentals.Where(r => r.Id == id)
-                           .FirstOrDefault();
+            return new Rental(_rentals.Where(r => r.Id == id)
+                           .FirstOrDefault());
+        }
+
+        public List<Rental> GetAll()
+        {
+            return _rentals.Select(r => new Rental(r))
+                            .ToList();
+        }
+
+        public Rental Update(int rentalId, int units, int preparationTime)
+        {
+            var rental = _rentals.Where(r => r.Id == rentalId).FirstOrDefault();
+            if(rental != null) rental.PreparationTimeInDays = preparationTime;
+            _unitRepository.RemoveByRental(rentalId);
+            _unitRepository.CreateMany(rentalId, units);
+            return Get(rentalId);
         }
     }
 }

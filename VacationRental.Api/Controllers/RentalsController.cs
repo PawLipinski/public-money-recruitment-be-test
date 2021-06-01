@@ -2,6 +2,7 @@
 using System.Linq;
 using VacationRental.Api.Models;
 using VacationRental.Api.Repositories;
+using VacationRental.Api.Services;
 
 namespace VacationRental.Api.Controllers
 {
@@ -11,11 +12,15 @@ namespace VacationRental.Api.Controllers
     {
         private readonly IRentalRepository _rentals;
         private readonly IUnitRepository _units;
+        private readonly IValidator _validator;
+        private readonly IChangeRentalService _changeRentalService;
 
-        public RentalsController(IRentalRepository rentals, IUnitRepository units)
+        public RentalsController(IRentalRepository rentals, IUnitRepository units, IValidator validator, IChangeRentalService changeRentalService)
         {
             _rentals = rentals;
             _units = units;
+            _validator = validator;
+            _changeRentalService = changeRentalService;
         }
 
         [HttpGet]
@@ -34,8 +39,19 @@ namespace VacationRental.Api.Controllers
         [HttpPost]
         public ResourceIdViewModel Post(RentalBindingModel model)
         {
+            _validator.ValidatePreparationTime(model.PreparationTimeInDays);
             var newRentalId = _rentals.Add(model.Units, model.PreparationTimeInDays);
-            return new ResourceIdViewModel(){ Id = newRentalId };
+            return new ResourceIdViewModel() { Id = newRentalId };
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Put([FromQuery] int id, [FromBody] RentalUpdate rentalUpdate)
+        {
+            _validator.ValidateUpdateRentalChanges(id, rentalUpdate.Units, rentalUpdate.PreparationTimeInDays);
+
+            _changeRentalService.ApplyChanges(id, rentalUpdate.Units, rentalUpdate.PreparationTimeInDays);
+            return Ok();
         }
     }
 }

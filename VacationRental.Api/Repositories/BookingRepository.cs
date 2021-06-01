@@ -9,6 +9,7 @@ namespace VacationRental.Api.Repositories
         Booking Get(int id);
         int Add(Booking booking);
         List<Booking> GetByRental(int rentalId);
+        void RemoveByRental(int rentalId);
         List<Booking> GetByUnit(int unitId);
     }
 
@@ -26,20 +27,27 @@ namespace VacationRental.Api.Repositories
 
         public Booking Get(int id)
         {
-            return _bookings.Where(b => b.Id == id)
-                            .FirstOrDefault();
+            return new Booking(_bookings.Where(b => b.Id == id)
+                            .FirstOrDefault());
         }
 
         public List<Booking> GetByRental(int rentalId)
         {
             return _bookings.Where(b => b.RentalId == rentalId)
+                            .Select(b => new Booking(b))
                             .ToList();
         }
 
         public List<Booking> GetByUnit(int unitId)
         {
             return _bookings.Where(b => b.UnitId == unitId)
+                            .Select(b => new Booking(b))
                             .ToList();
+        }
+
+        public void RemoveByRental(int rentalId)
+        {
+            _bookings.RemoveAll(u => u.RentalId == rentalId);
         }
     }
 }

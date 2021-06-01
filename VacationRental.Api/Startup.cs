@@ -35,6 +35,7 @@ namespace VacationRental.Api
             services.AddTransient<ICalendarBuilder, CalendarBuilder>();
             services.AddTransient<ICalendarWithPreparationsBuilder, CalendarWithPreparationsBuilder>();
             services.AddTransient<IBookingService, BookingService>();
+            services.AddTransient<IChangeRentalService, ChangeRentalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
