@@ -17,7 +17,6 @@ namespace VacationRental.Api.Services
 
         private readonly IBookingRepository _bookingRepository;
         private readonly IRentalRepository _rentalRepository;
-        //private readonly IUnitRepository _actualUnitRepository;
         private readonly IBookingService _bookingService;
 
         public ChangeRentalService(IBookingRepository bookings, IRentalRepository rentals, IBookingService bookingService)
