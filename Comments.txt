@@ -1,0 +1,9 @@
+- As there is no communication with the db, I implemented "repositories" to have "single source of truth" about the objects
+- To prevent modifying objects out of repository all the basic models implement prototype pattern, and repositories return deep copies of them
+- Booking logic has been slightly changed - since new model (Unit) has been introduced, it was most reasonable to create bookings per Unit object. 
+    Previously only number of units was checked and if number of the existing bookings at the same time was even to the number of Units - new booking was rejected.
+    Right now one Unit needs to be available for the whole booking time to make a booking (which wasn't the case for previous approach).
+    I find the new approach slightly better as it wouldn't result in a situation when someone needs to change the room during their stay. 
+    I haven't implemented mechanism to move the bookings between units for the sake of  optimization (I have left a commented code that works "the old way" in the new code though).
+
+¡Hasta luego!
