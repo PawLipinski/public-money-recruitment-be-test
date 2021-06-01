@@ -5,7 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using VacationRental.Api.Helpers;
 using VacationRental.Api.Models;
+using VacationRental.Api.Repositories;
+using VacationRental.Api.Services;
 
 namespace VacationRental.Api
 {
@@ -25,8 +28,14 @@ namespace VacationRental.Api
 
             services.AddSwaggerGen(opts => opts.SwaggerDoc("v1", new Info { Title = "Vacation rental information", Version = "v1" }));
 
-            services.AddSingleton<IDictionary<int, RentalViewModel>>(new Dictionary<int, RentalViewModel>());
-            services.AddSingleton<IDictionary<int, BookingViewModel>>(new Dictionary<int, BookingViewModel>());
+            services.AddSingleton<IRentalRepository, RentalRepository>();
+            services.AddSingleton<IUnitRepository, UnitRepository>();
+            services.AddSingleton<IBookingRepository, BookingRepository>();
+            services.AddSingleton<IValidator, Validator>();
+            services.AddTransient<ICalendarBuilder, CalendarBuilder>();
+            services.AddTransient<ICalendarWithPreparationsBuilder, CalendarWithPreparationsBuilder>();
+            services.AddTransient<IBookingService, BookingService>();
+            services.AddTransient<IChangeRentalService, ChangeRentalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

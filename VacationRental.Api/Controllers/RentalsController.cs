@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using VacationRental.Api.Models;
+using VacationRental.Api.Repositories;
+using VacationRental.Api.Services;
 
 namespace VacationRental.Api.Controllers
 {
@@ -9,35 +10,48 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
+        private readonly IRentalRepository _rentals;
+        private readonly IUnitRepository _units;
+        private readonly IValidator _validator;
+        private readonly IChangeRentalService _changeRentalService;
 
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        public RentalsController(IRentalRepository rentals, IUnitRepository units, IValidator validator, IChangeRentalService changeRentalService)
         {
             _rentals = rentals;
+            _units = units;
+            _validator = validator;
+            _changeRentalService = changeRentalService;
         }
 
         [HttpGet]
         [Route("{rentalId:int}")]
         public RentalViewModel Get(int rentalId)
         {
-            if (!_rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
-
-            return _rentals[rentalId];
+            var rental = _rentals.Get(rentalId);
+            var units = _units.GetByRental(rentalId);
+            return new RentalViewModel()
+            {
+                Id = rental.Id,
+                Units = units.Count(),
+            };
         }
 
         [HttpPost]
         public ResourceIdViewModel Post(RentalBindingModel model)
         {
-            var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
+            _validator.ValidatePreparationTime(model.PreparationTimeInDays);
+            var newRentalId = _rentals.Add(model.Units, model.PreparationTimeInDays);
+            return new ResourceIdViewModel() { Id = newRentalId };
+        }
 
-            _rentals.Add(key.Id, new RentalViewModel
-            {
-                Id = key.Id,
-                Units = model.Units
-            });
+        [HttpPut]
+        [Route("{id}")]
+        public IActionResult Put([FromQuery] int id, [FromBody] RentalUpdate rentalUpdate)
+        {
+            _validator.ValidateUpdateRentalChanges(id, rentalUpdate.Units, rentalUpdate.PreparationTimeInDays);
 
-            return key;
+            _changeRentalService.ApplyChanges(id, rentalUpdate.Units, rentalUpdate.PreparationTimeInDays);
+            return Ok();
         }
     }
 }
